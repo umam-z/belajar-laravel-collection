@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Data\Person;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\LazyCollection;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
@@ -449,5 +450,35 @@ class CollectionTest extends TestCase
 
         $result = $collection->avg();
         assertEquals(5.5, $result);
+    }
+
+    /**
+     * Collection test Reduce
+     */
+    public function testReduce(): void {
+        $collection = collect([1, 4, 5, 2, 3, 6, 9, 8, 7, 10]);
+
+        $result = $collection->reduce(function ($carry, $item) {
+            return $carry + $item;
+        });
+
+        assertEquals(55, $result);
+    }
+
+    /**
+     * Collection test LazyCollection
+     */
+    public function testLazyCollection(): void {
+        $collection = LazyCollection::make(function () {
+            $value = 0;
+            while (true) {
+                yield $value;
+                $value++;
+            }
+        });
+
+        $result = $collection->take(10);
+
+        assertEqualsCanonicalizing([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], $result->all());
     }
 }
